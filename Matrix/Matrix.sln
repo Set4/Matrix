@@ -5,16 +5,40 @@ VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MatrixRework", "MatrixRework\MatrixRework.csproj", "{415466CE-6826-483A-9545-B56E000104C5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MatrixCore", "MatrixCore\MatrixCore.csproj", "{8B87509D-F0C9-4BEE-8D6B-E99E330622F3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Matrix", "..\..\..\..\Desktop\Алине_по_бак_раб\матрикс\матрикс\Matrix_final-2015-10-23\Matrix_final\Matrix\Matrix\Matrix.csproj", "{99C34D66-723E-4659-B1FC-EE444B772065}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
+		Debug|x86 = Debug|x86
 		Release|Any CPU = Release|Any CPU
+		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{415466CE-6826-483A-9545-B56E000104C5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{415466CE-6826-483A-9545-B56E000104C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{415466CE-6826-483A-9545-B56E000104C5}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{415466CE-6826-483A-9545-B56E000104C5}.Debug|x86.Build.0 = Debug|Any CPU
 		{415466CE-6826-483A-9545-B56E000104C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{415466CE-6826-483A-9545-B56E000104C5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{415466CE-6826-483A-9545-B56E000104C5}.Release|x86.ActiveCfg = Release|Any CPU
+		{415466CE-6826-483A-9545-B56E000104C5}.Release|x86.Build.0 = Release|Any CPU
+		{8B87509D-F0C9-4BEE-8D6B-E99E330622F3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8B87509D-F0C9-4BEE-8D6B-E99E330622F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8B87509D-F0C9-4BEE-8D6B-E99E330622F3}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{8B87509D-F0C9-4BEE-8D6B-E99E330622F3}.Debug|x86.Build.0 = Debug|Any CPU
+		{8B87509D-F0C9-4BEE-8D6B-E99E330622F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8B87509D-F0C9-4BEE-8D6B-E99E330622F3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8B87509D-F0C9-4BEE-8D6B-E99E330622F3}.Release|x86.ActiveCfg = Release|Any CPU
+		{8B87509D-F0C9-4BEE-8D6B-E99E330622F3}.Release|x86.Build.0 = Release|Any CPU
+		{99C34D66-723E-4659-B1FC-EE444B772065}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{99C34D66-723E-4659-B1FC-EE444B772065}.Debug|x86.ActiveCfg = Debug|x86
+		{99C34D66-723E-4659-B1FC-EE444B772065}.Debug|x86.Build.0 = Debug|x86
+		{99C34D66-723E-4659-B1FC-EE444B772065}.Release|Any CPU.ActiveCfg = Release|x86
+		{99C34D66-723E-4659-B1FC-EE444B772065}.Release|x86.ActiveCfg = Release|x86
+		{99C34D66-723E-4659-B1FC-EE444B772065}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

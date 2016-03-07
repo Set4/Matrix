@@ -51,7 +51,12 @@ namespace MatrixCore
                     Matrix[height, width] = matrix[height, width];
         }
 
-        // Перемножение булевых матриц
+        /// <summary>
+        /// Перемножение bool матриц
+        /// </summary>
+        /// <param name="_matrix1">матрица 1</param>
+        /// <param name="_matrix2">матрица 2</param>
+        /// <returns></returns>
         private static bool[,] MultiplicationMatrix(bool[,] _matrix1, bool[,] _matrix2)
         {
             if (_matrix1.GetLength(1) != _matrix2.GetLength(0))
@@ -69,10 +74,13 @@ namespace MatrixCore
             return result;
         }
 
-        // нахождение циклов
+        /// <summary>
+        /// Нахождение циклов
+        /// </summary>
+        /// <returns>List<List<int>></returns>
         public List<List<int>> SearchCycles()
         {
-            List<List<int>> cycles = new List<List<int>>();//динамическая матрицы
+            List<List<int>> cycles = new List<List<int>>();//динамическая матрица
             bool[,] matrixClone = Matrix;//копия матрицы
 
             for (int stage = 0; stage < SizeMatrix - 1; stage++)
@@ -90,6 +98,68 @@ namespace MatrixCore
             return cycles;
         }
 
+
+        /// <summary>
+        /// Изменение размера матрицы с сохранением значений
+        /// </summary>
+        /// <param name="size">новый размер матрицы</param>
+        public void CloneMatrix(int size)
+        {
+            bool[,] newMatrix = new bool[size, size];
+
+            for (int height = 0; height < size; height++)
+                for (int width = 0; width < size; width++)
+                    newMatrix[height, width] = Matrix[height, width];
+
+            Matrix = newMatrix;
+        }
+
+        /// <summary>
+        /// Проверка введенной матрицы на наличие не 0 или 1
+        /// </summary>
+        /// <param name="matrix">проверяемая матрица</param>
+        /// <returns>Получаем матрицы с Cells, не равных 1 или 0 </returns>
+        public List<List<int[]>> GetBadCellsMatrix(string[,] matrix)
+        {
+            List<List<int[]>> badMatrix = new List<List<int[]>>();
+            int _result;
+            bool _b;
+
+            for (int height = 0; height < SizeMatrix; height++)
+            {
+                List<int[]> _list = new List<int[]>();
+                for (int width = 0; width < SizeMatrix; width++)
+                {
+                    _b = Int32.TryParse(matrix[height, width], out _result);
+                    if (!_b && (_result != 0 || _result != 1))
+                        _list.Add(new int[2] { height, width });
+                }
+                badMatrix.Add(_list);
+            }
+            return badMatrix;
+        }
+
+        /// <summary>
+        /// Переводим string 0 и 1 в bool(true, false)
+        /// </summary>
+        /// <param name="matrix"></param>
+        /// <returns>матрица bool</returns>
+        public bool[,] ConvertMatrixToBool(string[,] matrix)
+        {
+            bool[,] convertMatrix = new bool[SizeMatrix, SizeMatrix];
+
+            for (int height = 0; height < SizeMatrix; height++)
+            {
+                for (int width = 0; width < SizeMatrix; width++)
+                {
+                    if (Int32.Parse(matrix[height, width]) == 1)
+                        convertMatrix[height, width] = true;
+                   else if (Int32.Parse(matrix[height, width]) == 0)
+                        convertMatrix[height, width] = false;
+                }
+            }
+            return convertMatrix;
+        }
 
     }
 }
