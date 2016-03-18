@@ -114,7 +114,7 @@ namespace MatrixRework
 
 
 
-        public string[,] ReadExcelFile(string path, int size)
+        public string[,] ReadExcelFile(string path)
         {
             Excel.Application ObjWorkExcel = new Excel.Application(); //открыть эксель
             Excel.Workbook ObjWorkBook = ObjWorkExcel.Workbooks.Open(path, 
@@ -127,10 +127,10 @@ namespace MatrixRework
             Excel.Worksheet ObjWorkSheet = (Excel.Worksheet)ObjWorkBook.Sheets[1]; //получить 1 лист
 
             var lastCell = ObjWorkSheet.Cells.SpecialCells(Excel.XlCellType.xlCellTypeLastCell);//1 ячейку
-            string[,] list = new string[size, size]; // массив значений с листа равен по размеру листу
+            string[,] list = new string[(int)lastCell.Column, (int)lastCell.Row]; // массив значений с листа равен по размеру листу
 
-            for (int i = 1; i < lastCell.Column; i++) //по всем колонкам
-                for (int j = 1; j < lastCell.Row; j++) // по всем строкам
+            for (int i = 0; i < (int)lastCell.Column; i++) //по всем колонкам
+                for (int j = 0; j < (int)lastCell.Row; j++) // по всем строкам
                     list[i, j] = ObjWorkSheet.Cells[j + 1, i + 1].Text.ToString();//считываем текст в строку
 
             ObjWorkBook.Close(false, Type.Missing, Type.Missing); //закрыть не сохраняя
