@@ -37,6 +37,10 @@
     <!-- A reference to the entire .NET Framework is automatically included -->
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Circuit.cs" />
+    <Compile Include="Current.cs" />
+    <Compile Include="EventMessage.cs" />
+    <Compile Include="Matrix.cs" />
     <Compile Include="MatrixModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

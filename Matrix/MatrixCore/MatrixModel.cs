@@ -5,288 +5,71 @@ using System.Text;
 
 namespace MatrixCore
 {
-    public static class Methods
+   
+  public  class MatrixModel
     {
-
-        /// <summary>
-        /// Перемножение bool матриц
-        /// </summary>
-        /// <param name="_matrix1">матрица 1</param>
-        /// <param name="_matrix2">матрица 2</param>
-        /// <returns></returns>
-        public static bool[,] MultiplicationMatrix(bool[,] _matrix1, bool[,] _matrix2)
-        {
-            if (_matrix1.GetLength(1) != _matrix2.GetLength(0))
-                return null;
-
-            var result = new bool[_matrix1.GetLength(0), _matrix2.GetLength(1)];
-            for (int height = 0; height < result.GetLength(0); height++)
-                for (int width = 0; width < result.GetLength(1); width++)
-                {
-                    result[width, height] = false;
-                    for (var k = 0; k < _matrix1.GetLength(1); k++)
-                        result[width, height] |= _matrix1[width, k] && _matrix2[k, height];
-                }
-
-            return result;
-        }
-
-        /// <summary>
-        /// Перемножение bool матриц по элементно
-        /// </summary>
-        /// <param name="_matrix1">матрица 1</param>
-        /// <param name="_matrix2">матрица 2</param>
-        /// <returns></returns>
-        public static bool[,] MultiplicationElementsMatrix(bool[,] _matrix1, bool[,] _matrix2)
-        {
-            if (_matrix1.GetLength(1) != _matrix2.GetLength(0))
-                return null;
-
-            var result = new bool[_matrix1.GetLength(0), _matrix2.GetLength(1)];
-            for (int height = 0; height < result.GetLength(0); height++)
-                for (int width = 0; width < result.GetLength(1); width++)
-                {
-                    result[width, height] = _matrix1[width, height] && _matrix2[width, height];
-                }
-
-            return result;
-        }
-
-
-        /// <summary>
-        /// Суммирование bool матриц по элементно
-        /// </summary>
-        /// <param name="_matrix1">матрица 1</param>
-        /// <param name="_matrix2">матрица 2</param>
-        /// <returns></returns>
-        public static bool[,] SummirovanieMatrix(bool[,] _matrix1, bool[,] _matrix2)
-        {
-            if (_matrix1.GetLength(1) != _matrix2.GetLength(0))
-                return null;
-
-            var result = new bool[_matrix1.GetLength(0), _matrix2.GetLength(1)];
-            for (int height = 0; height < result.GetLength(0); height++)
-                for (int width = 0; width < result.GetLength(1); width++)
-                {
-                    result[width, height] = _matrix1[width, height] || _matrix2[width, height];
-                }
-
-            return result;
-        }
-
-        /// <summary>
-        /// Transponirovamie bool матрицы 
-        /// </summary>
-        /// <param name="_matrix1">матрица 1</param>
-        /// <param name="_matrix2">матрица 2</param>
-        /// <returns></returns>
-        public static bool[,] Transponirovanie(bool[,] _matrix)
-        {
-            var result = new bool[_matrix.GetLength(0), _matrix.GetLength(1)];
-            for (int height = 0; height < result.GetLength(0); height++)
-                for (int width = 0; width < result.GetLength(1); width++)
-                {
-                    result[width, height] = _matrix[width, height];
-                }
-
-            return result;
-        }
-
-
-        /// <summary>
-        /// nahojdenie kontyra bool матрицы 
-        /// </summary>
-        /// <param name="_matrix">матрица 1</param>
-        /// <returns></returns>
-        public static List<int> NahojdenieKontyra(bool[,] _matrix)
-        {
-            List<int> list = new List<int>();
-            // Анализ матрицы, нахождение циклов
-            for (int height = 0; height < _matrix.GetLength(0); height++)
-                for (int width = 0; width < _matrix.GetLength(1); width++)
-                    if ((height == width) & (_matrix[height, width] == true))
-                        list.Add(height + 1);
-
-            return list;
-        }
-
-
+        Matrix matrix { get; set; }
 
       
+    
 
-    }
-
-
-    class MatrixModel
-    {
-        private int _sizeMatrix;
 
         /// <summary>
-        /// Размер матрицы
+        /// Создание матрицы и заполнение матрицы
         /// </summary>
-        public int SizeMatrix
+        /// <param name="size">размер матрицы</param>
+        public void CreateMatrix(int size,)
         {
-            get { return _sizeMatrix; }
-            private set
+            /////!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1 ивсе другие действия с начальной матрицей
+            matrix = new Matrix(size);
+        }
+
+
+        /// <summary>
+        /// Событие нахождения неверных значений матрицы
+        /// </summary>
+        public event EventHandler<EventMessage> BadMatrix = delegate { };
+
+        /// <summary>
+        /// Событие вычисление закончено
+        /// </summary>
+        public event EventHandler<EventMessage> СalculationСompleted = delegate { };
+
+
+
+
+        /// <summary>
+        /// Проверка введенной матрицы на правильность
+        /// </summary>
+        /// <param name="matrix">матрица</param>
+        /// <returns>true- если матрица содержит неверные элементы</returns>
+        public bool IsBadMatrix(string[,] matrix)
+        {
+            List<List<int[]>> badMatrix = GetBadCellsMatrix(matrix);
+            if (badMatrix.Count != 0)
             {
-
-                if (value <= 0)
-                    _sizeMatrix = 0;//можем вызывать событие ошибки
-                else
-                    _sizeMatrix = value;
+                BadMatrix(this, new EventMessage("Найдены неверные значения матрицы", badMatrix));
+                return true;
             }
-        }
-
-
-
-        /// <summary>
-        /// Матрица smejnosti
-        /// </summary>
-        public bool[,] MatrixSmejnosti { get; private set; }
-
-        /// <summary>
-        /// Матрица dostijimosti
-        /// </summary>
-        public bool[,] MatrixDostijimosti { get; private set; }
-
-        /// <summary>
-        /// MatrixSvazannosti
-        /// </summary>
-        public bool[,] MatrixSvazannosti { get
-            {
-                return Methods.MultiplicationElementsMatrix(MatrixDostijimosti, Methods.Transponirovanie(MatrixDostijimosti));
-            }
-        }
-
-        /// <summary>
-        /// Создание пустой матрицы
-        /// </summary>
-        /// <param name="sizeMatrix">размер матрицы</param>
-        public MatrixModel(int sizeMatrix)
-        {
-            SizeMatrix = sizeMatrix;
-            MatrixSmejnosti = new bool[SizeMatrix, SizeMatrix];
-            MatrixDostijimosti = new bool[SizeMatrix, SizeMatrix];
-        }
-
-
-
-
-        private List<int> Nahojdeniebloka(int _start, int stage)
-        {
-            List<int> kontyr = new List<int>();
-
-            for (int a = _start - 1; a < stage; a++)
-            {
-                for (int b = -1; b < stage; b++)
-                    if (MatrixSvazannosti[a, b] != true)
-                        return null;
-                kontyr.Add(a + 1);
-            }
-
-            return kontyr;
-        }
-
-        private List<List<int>> YtochninieContyra(int stage, List<int> kontyr)
-        {
-            List<List<int>> koliakontyrov = new List<List<int>>();
-            foreach(int i in kontyr)
-            {
-                List<int> item = Nahojdeniebloka(i, stage);
-                if (item != null)
-                    koliakontyrov.Add(item);
-            }
-            return koliakontyrov;
-        }
-
-        /// <summary>
-        /// Нахождение kontyrov
-        /// </summary>
-        /// <returns>List<List<int>></returns>
-        public List<List<int>> SearchCycles()
-        {
-            List<List<int>> cycles = new List<List<int>>();//динамическая матрица
-            bool[,] matrixtekysheistepeni =MatrixDostijimosti= MatrixSmejnosti;//копия матрицы
-
-            for (int stage = 0; stage < SizeMatrix - 1; stage++)
-            {
-                //Перемножение номер: " + stage+1 + " \n";
-                matrixtekysheistepeni = Methods.MultiplicationMatrix(matrixtekysheistepeni, MatrixSmejnosti);//перемножение матриц при помощи метода Mul
-                MatrixDostijimosti = Methods.SummirovanieMatrix(MatrixDostijimosti, matrixtekysheistepeni);
-
-                List<int> list = Methods.NahojdenieKontyra(matrixtekysheistepeni);
-                if (!cycles.Contains(list) && list.Count != 0)
-                {
-                    if (list.Count <= stage + 1)
-                        cycles.Add(list);
-                    else
-                    cycles.AddRange( YtochninieContyra(stage, list));//ytochnenie kontyra
-                }
-            }
-            return cycles;
-        }
-
-
-        public Dictionary<int, int[]>  YporadochivanieContyra(List<int> contyr)
-        {
-            Dictionary<int, int[]> kont = new Dictionary<int, int[]>();
-            foreach (int i in contyr)
-                for (int j = 0; j < MatrixSmejnosti.Length; j++)
-                    if (MatrixSmejnosti[i, j] == true && contyr.Contains(j))
-                        kont.Add(i, new int[] { i, j });
-            return kont;
-        }
-
-
-
-        public List<List<Dictionary<int, int[]>>> SearchRazrili(List<Dictionary<int, int[]>> contyri)
-        {
-            List<int[]> vsepotoki=new List<int[]>();
-            foreach (Dictionary<int, int[]> item in contyri)
-                foreach (KeyValuePair<int, int[]> i in item)
-                    if (vsepotoki.BinarySearch(i.Value) == -1)
-                        vsepotoki.Add(i.Value);
-
-
-            Dictionary<int, int[]> potokichactotaego = new Dictionary<int, int[]>();
-           
-                foreach (Dictionary<int, int[]> item in contyri)
-                    foreach (KeyValuePair<int, int[]> i1 in item)
-                        if (vsepotoki.BinarySearch(i1.Value) !=-1)
-                            
-        }
-
-
-        /// <summary>
-        /// Изменение размера матрицы с сохранением значений
-        /// </summary>
-        /// <param name="size">новый размер матрицы</param>
-        public void CloneMatrix(int size)
-        {
-            bool[,] newMatrix = new bool[size, size];
-
-            for (int height = 0; height < size; height++)
-                for (int width = 0; width < size; width++)
-                    newMatrix[height, width] = Matrix[height, width];
-
-            Matrix = newMatrix;
+            else
+                return false;               
         }
 
         /// <summary>
         /// Проверка введенной матрицы на наличие не 0 или 1
         /// </summary>
         /// <param name="matrix">проверяемая матрица</param>
-        /// <returns>Получаем матрицы с Cells, не равных 1 или 0 </returns>
-        public List<List<int[]>> GetBadCellsMatrix(string[,] matrix)
+        /// <returns>Получаем матрицу с индексами ячеек, не равных 1 или 0 </returns>
+        private List<List<int[]>> GetBadCellsMatrix(string[,] matrix)
         {
             List<List<int[]>> badMatrix = new List<List<int[]>>();
             int _result;
             bool _b;
 
-            for (int height = 0; height < SizeMatrix; height++)
+            for (int height = 0; height < matrix.GetLength(0); height++)
             {
                 List<int[]> _list = new List<int[]>();
-                for (int width = 0; width < SizeMatrix; width++)
+                for (int width = 0; width < matrix.GetLength(1); width++)
                 {
                     _b = Int32.TryParse(matrix[height, width], out _result);
                     if (!_b && (_result != 0 || _result != 1))
@@ -301,23 +84,118 @@ namespace MatrixCore
         /// Переводим string 0 и 1 в bool(true, false)
         /// </summary>
         /// <param name="matrix"></param>
-        /// <returns>матрица bool</returns>
+        /// <returns>матрица bool[,]</returns>
         public bool[,] ConvertMatrixToBool(string[,] matrix)
         {
-            bool[,] convertMatrix = new bool[SizeMatrix, SizeMatrix];
+            bool[,] convertMatrix = new bool[matrix.GetLength(0), matrix.GetLength(1)];
 
-            for (int height = 0; height < SizeMatrix; height++)
+            for (int height = 0; height < matrix.GetLength(0); height++)
             {
-                for (int width = 0; width < SizeMatrix; width++)
+                for (int width = 0; width < matrix.GetLength(1); width++)
                 {
                     if (Int32.Parse(matrix[height, width]) == 1)
                         convertMatrix[height, width] = true;
-                   else if (Int32.Parse(matrix[height, width]) == 0 || matrix[height, width]==String.Empty)
+                    else if (Int32.Parse(matrix[height, width]) == 0 || matrix[height, width] == String.Empty)
                         convertMatrix[height, width] = false;
                 }
             }
             return convertMatrix;
         }
 
+
+
+
+
+
+
+        /// <summary>
+        /// Нахождение контуров
+        /// </summary>
+        /// <returns>контуры List<Сircuit></returns>
+        public List<Сircuit> SearchСircuit()
+        {
+            List<Сircuit> _сircuit = new List<Сircuit>();
+            bool[,] _matrix =matrix.ReachabilityMatrix= matrix.AdjacencyMatrix;// матрица хранящая возведенную в степень матрицу
+
+            for (int stage = 0; stage < matrix.SizeMatrix - 1; stage++)
+            {
+                //Перемножение номер: " + stage+1 + " \n";
+                _matrix = Matrix.MultiplicationMatrix(_matrix, matrix.AdjacencyMatrix);//перемножение матриц при помощи метода Mul
+                matrix.ReachabilityMatrix = Matrix.SummationMatrix(matrix.ReachabilityMatrix, _matrix);
+//
+                List<int> _cir =Matrix.SearchСircuitVertices(_matrix);
+                if (!_сircuit.Contains(_cir) && _cir.Count != 0)
+                {
+                    if (_cir.Count <= stage + 1)
+                        _сircuit.Add(_cir);
+                    else
+                        _сircuit.AddRange( YtochninieContyra(stage, _cir));//ytochnenie kontyra
+                }
+            }
+
+            СalculationСompleted(this, new EventMessage("Нахождение контуров завершено", cycles));
+
+            return cycles;
+        }
+
+
+
+     
+
+        /// <summary>
+        /// поиск разрываемых потоков
+        /// </summary>
+        /// <param name="circuits">список всех циклов</param>
+        /// <returns>поток-список циклов которые он разрывает</returns>
+        public Dictionary<Current, List<Сircuit>> SearchTornCurrent(List<Сircuit> circuits)
+        {
+            Dictionary<Current, List<Сircuit>> _dict = new Dictionary<Current, List<Сircuit>>();
+
+            List<Сircuit> _circuits = circuits;
+            Сircuit generalСircuit = new Сircuit(new List<Current>());
+            foreach (Сircuit circuit in circuits)
+                foreach (Current item in circuit.CurrentList)
+                {
+                    generalСircuit.AddСircuitItem(item);
+                }
+
+            while (_circuits.Count != 0)
+            {
+
+                List<Сircuit> _item = new List<Сircuit>();
+
+
+                Current maxitem= generalСircuit.CurrentList.Where(obj => obj.Amount == generalСircuit.CurrentList.Max(i => i.Amount)).First();
+
+
+                foreach (Сircuit circuit in _circuits)
+                {
+                    if (circuit.CurrentList.IndexOf(maxitem) != -1)
+                    {
+                        _item.Add(circuit);
+                        _circuits.Remove(circuit);
+                    }
+                }
+
+                _dict.Add(maxitem, _item);
+
+              generalСircuit.CurrentList.Remove(maxitem);
+            }
+
+            СalculationСompleted(this, new EventMessage("Нахождение разрываемых потоков завершено", _dict));
+            return _dict;
+        }
+
+
+
+
+
     }
+
+   
+
+
+    
+
+
 }
