@@ -5,30 +5,14 @@ using System.Text;
 
 namespace MatrixCore
 {
-    class Matrix
+   public class Matrix
     {
-        /// <summary>
-        /// Событие размер матрицы меньше или равно 0
-        /// </summary>
-        public event EventHandler<EventMessage> ErrorSizeMatrix = delegate { };
-
-
-        private int _sizeMatrix=0;
-
         /// <summary>
         /// Размер матрицы
         /// </summary>
         public int SizeMatrix
         {
-            get { return _sizeMatrix; }
-            private set
-            {
-
-                if (value <= 0)
-                    ErrorSizeMatrix(this, new EventMessage("размер матрицы меньше или равно 0"));
-                else
-                    _sizeMatrix = value;
-            }
+            get { return AdjacencyMatrix.GetLength(0); } 
         }
 
 
@@ -41,7 +25,7 @@ namespace MatrixCore
         /// <summary>
         /// Матрица достижимости
         /// </summary>
-        public bool[,] ReachabilityMatrix { get; set; }
+        public bool[,] ReachabilityMatrix { get; private set; }
 
 
         /// <summary>
@@ -51,19 +35,18 @@ namespace MatrixCore
         {
             get
             {
-                return MultiplicationElementsMatrix(ReachabilityMatrix, TranspositionMatrix(ReachabilityMatrix));
+                return MatrixMethods.MultiplicationElementsMatrix(ReachabilityMatrix, MatrixMethods.TranspositionMatrix(ReachabilityMatrix));
             }
         }
 
 
         /// <summary>
-        /// Создание пустой матрицы
+        /// Создание матрицы
         /// </summary>
         /// <param name="sizeMatrix">размер матрицы</param>
-        public Matrix(int sizeMatrix)
+        public Matrix(bool[,] matrix)
         {
-            SizeMatrix = sizeMatrix;
-            AdjacencyMatrix = new bool[SizeMatrix, SizeMatrix];
+            AdjacencyMatrix = ReachabilityMatrix = matrix;
         }
 
 
@@ -91,6 +74,54 @@ namespace MatrixCore
 
 
 
+        /// <summary>
+        /// Нахождение контуров
+        /// </summary>
+        /// <returns>контуры List<Сircuit></returns>
+        public List<Сircuit> SearchСircuit()
+        {
+            List<Сircuit> _сircuit = new List<Сircuit>();
+
+            List<List<int>> _items = new List<List<int>>();
+
+            bool[,] _matrix = ReachabilityMatrix = AdjacencyMatrix;// матрица хранящая возведенную в степень матрицу
+
+            for (int stage = 2; stage < SizeMatrix + 1; stage++)
+            {
+               
+
+                //Перемножение номер: " + stage+1 + " \n";
+                _matrix = MatrixMethods.MultiplicationMatrix(_matrix, AdjacencyMatrix);//перемножение матриц при помощи метода Mul
+                ReachabilityMatrix = MatrixMethods.SummationMatrix(ReachabilityMatrix, _matrix);
+                //
+                List<int> _cir = MatrixMethods.SearchСircuitVertices(_matrix);
+                if (!_items.Contains(_cir) && _cir.Count != 0)
+                {
+
+
+                    if (_cir.Count <= stage)
+                    {
+                        _сircuit.Add(new Сircuit(_cir, AdjacencyMatrix));
+                        _items.Add(_cir);
+                    }
+                    else
+                    {
+                        List<List<int>> _it= FragmentationCircuit(stage, _cir);
+                        _items.AddRange(_it);
+
+                        foreach(List<int> i in _it)
+                        _сircuit.Add(new Сircuit(i, AdjacencyMatrix));
+                    }
+                }
+            }
+
+
+            return _сircuit;
+        }
+
+
+
+
 
 
         /// <summary>
@@ -99,40 +130,57 @@ namespace MatrixCore
         /// <param name="stage">степень матрицы смежности</param> 
         /// /// <param name="_start">вершина контура</param>
         /// <returns>точненные вершина контура</returns>
-        private List<int> SearchBlock(int stage, int _start)
+        private bool SearchBlock(int stage, int _start, List<int> _сir)
         {
-            List<int> _item = new List<int>();
+            for (int height =_start;height<stage+_start ; height++)
+                for (int width =_start; width< stage + _start; width++)
+                    if (СonnectivityMatrix[height, width] != true&&_сir.Contains(height) && _сir.Contains(width))
+                        return false;
+                
+           
 
-            for (int height = _start - 1; height < stage; height++)
-            {
-                for (int width = -1; width < stage; width++)
-                    if (СonnectivityMatrix[height, width] != true)
-                        return null;
-                _item.Add(height + 1);
-            }
-
-            return _item;
+            return true;
         }
 
         /// <summary>
         /// "Уточнение" контура(разбиение полученных вершин на несколько контуров)
         /// </summary>
         /// <param name="stage">степень матрицы смежности</param>
-        /// <param name="_сircuit">список вершин контура</param>
+        /// <param name="_сir">список вершин контура</param>
         /// <returns>полученных вершин на несколько контуров</returns>
-        private List<List<int>> FragmentationCircuit(int stage, List<int> _сircuit)
+        private List<List<int>> FragmentationCircuit(int stage, List<int> _сir)
         {
             List<List<int>> _сircuits = new List<List<int>>();
-            foreach (int i in _сircuit)
+            for (int index = 0;index < _сir.Count && _сir[index] - 1 <= SizeMatrix - stage  ;)
             {
-                List<int> item = SearchBlock(i, stage);
-                if (item != null)
+                List<int> item = new List<int>();
+
+                if (SearchBlock(stage, _сir[index] - 1, _сir))
+                {
+
+                    for (int i = index; i < stage + index; i++)
+                        item.Add(_сir[i]);
+
                     _сircuits.Add(item);
+                    index += stage;
+                }
+                else
+                    index++;
+
             }
             return _сircuits;
         }
 
 
+    }
+
+
+
+    /// <summary>
+    /// Методы пр работе с матрицей
+    /// </summary>
+    internal static class MatrixMethods
+    {
 
         /// <summary>
         /// Нахождение вершин контура bool матрицы
@@ -150,12 +198,6 @@ namespace MatrixCore
 
             return list;
         }
-
-
-
-
-
-
 
 
 
@@ -188,7 +230,7 @@ namespace MatrixCore
         /// <param name="_matrix1">матрица 1</param>
         /// <param name="_matrix2">матрица 2</param>
         /// <returns>матрицу bool[,]</returns>
-        private static bool[,] MultiplicationElementsMatrix(bool[,] _matrix1, bool[,] _matrix2)
+        public static bool[,] MultiplicationElementsMatrix(bool[,] _matrix1, bool[,] _matrix2)
         {
             if (_matrix1.GetLength(1) != _matrix2.GetLength(0))
                 return null;
@@ -232,7 +274,7 @@ namespace MatrixCore
         /// </summary>
         /// <param name="_matrix1">матрица 1</param>
         /// <returns>транспонированную матрицу bool[,]</returns>
-        private static bool[,] TranspositionMatrix(bool[,] _matrix)
+        public static bool[,] TranspositionMatrix(bool[,] _matrix)
         {
             var result = new bool[_matrix.GetLength(0), _matrix.GetLength(1)];
             for (int height = 0; height < result.GetLength(0); height++)
@@ -243,7 +285,6 @@ namespace MatrixCore
 
             return result;
         }
-
 
 
     }

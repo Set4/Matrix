@@ -4,9 +4,237 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MatrixRework"
-        mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
-    <Grid>
         
+       xmlns:wf="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
+
+        
+        mc:Ignorable="d"
+        
+      
+        
+        Title="MainWindow" Height="400" Width="720" MinHeight="500" MinWidth="720">
+    
+    <Grid x:Name="mainGrid" MinHeight="400" MinWidth="700">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="100*"/>
+            <RowDefinition Height="30"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="300*" MinWidth="400"/>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="300*" MinWidth="300"/>
+        </Grid.ColumnDefinitions>
+
+        <StackPanel  Grid.Row="0"
+            Grid.Column="0"
+            Grid.ColumnSpan="3">
+
+
+      
+
+ 
+
+            <Menu Height="20" 
+                  Margin="0"
+              VerticalAlignment="Top">
+           
+                <MenuItem Header="Файл">
+                <MenuItem Header="Создать" Click="MenuItemNewFile_Click" ></MenuItem>
+                <MenuItem Header="Открыть" >
+                    <MenuItem Header="Открыть .txt"></MenuItem>
+                        <MenuItem Header="Открыть Excel" ></MenuItem>
+                </MenuItem>
+                    <Separator />
+                    <MenuItem Header="Сохранить" />
+                    <MenuItem Header="Сохранить как" />
+                    <Separator />
+                    <MenuItem Header="Выход" Click="MenuItemExit_Click" ></MenuItem>
+            
+                </MenuItem>
+                <MenuItem Header="Вычисление" >
+
+                    <MenuItem Header="Вычисление Контура" ></MenuItem>
+                    <MenuItem Header="Вычисление Мест Разрыва" ></MenuItem>
+                    <MenuItem Header="Вычисление" Click="MenuItemVichislenieVsego_Click" ></MenuItem>
+                </MenuItem>
+                
+            <MenuItem Click="MenuItemInfo_Click" Header="Информация" ></MenuItem>
+                
+        </Menu>
+
+
+            <ToolBar 
+            x:Name="toolBar" 
+            HorizontalAlignment="Stretch" 
+            Margin="5" 
+                Height="25"
+            VerticalAlignment="Stretch">
+
+                <TextBlock HorizontalAlignment="Right" Width="60" Margin="5 0 0 0">Размер</TextBlock>
+
+                <WindowsFormsHost 
+        
+         HorizontalAlignment="Stretch"
+         VerticalAlignment="Stretch"
+       >
+                    <wf:NumericUpDown 
+                        x:Name="numudSizeMatrix" 
+                        Minimum="1" 
+                        AutoSize="True"
+                       KeyPress="numudSizeMatrix_KeyPress" />
+                    
+                </WindowsFormsHost>
+
+              
+              
+                <Separator />
+                <Button>
+                    <StackPanel Orientation="Horizontal">
+                        <Ellipse Width="10" Height="10" Fill="Red"  HorizontalAlignment="Left"/>
+                        <TextBlock HorizontalAlignment="Right" Width="60" Margin="5 0 0 0">Вычислить</TextBlock>
+                    </StackPanel>
+                </Button>
+
+
+
+            </ToolBar>
+            
+</StackPanel>
+
+        <WindowsFormsHost 
+            Grid.Column="0"
+            Grid.Row="1"
+         HorizontalAlignment="Stretch"
+         VerticalAlignment="Stretch"
+         Margin="5">
+            
+            <wf:DataGridView x:Name="dgvTable" 
+                             MultiSelect="False"
+                             AllowUserToAddRows = "False"
+                             AllowUserToResizeColumns="False"
+                             AllowUserToResizeRows="False"
+                           AutoSizeColumnsMode="AllCells"
+                           CellEndEdit="dgvTable_CellEndEdit" />
+       
+        </WindowsFormsHost>
+
+        <!--<ScrollViewer  Grid.Row="1"
+            Grid.Column="0" Margin="5"
+                                  CanContentScroll="True" 
+                                  VerticalScrollBarVisibility="Auto"
+                                  HorizontalScrollBarVisibility="Auto">
+            <DataGrid 
+          
+            x:Name="dataGrid" 
+            Margin="0" 
+           
+            VerticalAlignment="Stretch"  
+            HorizontalAlignment="Stretch"
+            HeadersVisibility="None"
+            
+            ItemsSource="{Binding}"
+            CellEditEnding="dataGrid_CellEditEnding"
+                
+       
+          
+            RowBackground="White" 
+           AlternatingRowBackground="Gainsboro"  AlternationCount="2"
+           >
+
+
+                --><!--<DataGridTemplateColumn>
+                <DataGridTemplateColumn.CellTemplate>
+                    <DataTemplate>
+                        <TextBox MaxLength="1"  Height="10" Width="10" 
+                     HorizontalContentAlignment="Center" 
+                     VerticalContentAlignment="Center" 
+                     TextAlignment="Center"/>
+                    </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>--><!--
+
+
+            </DataGrid>
+            
+        </ScrollViewer>-->
+        
+        <GridSplitter 
+            x:Name="gridSplitter" 
+            HorizontalAlignment="Center" 
+            Margin="0" 
+            Width="5"
+            VerticalAlignment="Stretch" 
+            Grid.Column="1" 
+            Grid.Row="1"/>
+
+
+        <TabControl x:Name="tabControl" 
+                    HorizontalAlignment="Stretch" 
+                    VerticalAlignment="Stretch"
+                    Margin="5"                    
+                    Grid.Column="2" 
+                    Grid.Row="1">
+            <TabItem Header="Контуры">
+                <Grid Background="#FFE5E5E5">
+                    <ScrollViewer Name="scroll" 
+                                  CanContentScroll="True" 
+                                  VerticalScrollBarVisibility="Auto"
+                                  HorizontalScrollBarVisibility="Disabled">
+                        <TextBlock 
+                        x:Name="textBlock" 
+                        HorizontalAlignment="Stretch" 
+                        Margin="5" 
+                        TextWrapping="Wrap" 
+                      
+                        VerticalAlignment="Stretch"/>
+                        </ScrollViewer>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Места разрыва">
+                <Grid Background="#FFE5E5E5">
+                    <ScrollViewer Name="scroll1" 
+                                  CanContentScroll="True" 
+                                  VerticalScrollBarVisibility="Auto"
+                                  HorizontalScrollBarVisibility="Disabled">
+                        <TextBlock 
+                        x:Name="textBlock1" 
+                        HorizontalAlignment="Stretch" 
+                        TextWrapping="Wrap" 
+                      
+                        VerticalAlignment="Stretch"/>
+                    </ScrollViewer>
+                </Grid>
+            </TabItem>
+        </TabControl>
+        
+        <StatusBar 
+            HorizontalAlignment="Stretch" 
+           
+            Margin="0" 
+            VerticalAlignment="Stretch" 
+            
+            Grid.ColumnSpan="3" 
+            Grid.Row="2">
+
+            <TextBlock 
+                        x:Name="textBlock2" 
+                        HorizontalAlignment="Stretch" 
+                        Margin="5" 
+                        TextWrapping="NoWrap" 
+                Width="300"
+                        Text="{Binding Path=status}"
+                        VerticalAlignment="Stretch"/>
+            <ProgressBar 
+                HorizontalAlignment="Right"
+                Margin="5,0,10,0"
+                Height="10" 
+                Width="200"/>
+        </StatusBar>
+        
+       
+        
+     
+
     </Grid>
 </Window>

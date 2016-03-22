@@ -10,18 +10,31 @@ namespace MatrixCore
     {
         Matrix matrix { get; set; }
 
-      
-    
+
+        /// <summary>
+        /// Событие размер матрицы меньше или равно 0
+        /// </summary>
+        public event EventHandler<EventMessage> ErrorSizeMatrix = delegate { };
+
 
 
         /// <summary>
         /// Создание матрицы и заполнение матрицы
         /// </summary>
-        /// <param name="size">размер матрицы</param>
-        public void CreateMatrix(int size,)
+        public bool CreateMatrix(int weght, int height, bool[,] _matrix)
         {
-            /////!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1 ивсе другие действия с начальной матрицей
-            matrix = new Matrix(size);
+            if (weght == height && weght > 0)
+            {
+
+                matrix = new Matrix(_matrix);
+                return true;
+            }
+            else
+            {
+
+                ErrorSizeMatrix(this, new EventMessage("размер матрицы меньше или равно 0"));
+                return false;
+            }
         }
 
 
@@ -35,6 +48,20 @@ namespace MatrixCore
         /// </summary>
         public event EventHandler<EventMessage> СalculationСompleted = delegate { };
 
+
+            // СalculationСompleted(this, new EventMessage("Нахождение контуров завершено", cycles));
+
+            
+
+
+            public bool IsBadCell(string cell)
+        {
+            if (cell != "1" || cell != "0" || !String.IsNullOrEmpty(cell))
+                return false;
+            else
+                return true;
+
+        }
 
 
 
@@ -93,9 +120,9 @@ namespace MatrixCore
             {
                 for (int width = 0; width < matrix.GetLength(1); width++)
                 {
-                    if (Int32.Parse(matrix[height, width]) == 1)
+                    if (matrix[height, width] == "1")
                         convertMatrix[height, width] = true;
-                    else if (Int32.Parse(matrix[height, width]) == 0 || matrix[height, width] == String.Empty)
+                    else if (matrix[height, width] == "0")
                         convertMatrix[height, width] = false;
                 }
             }
@@ -108,39 +135,15 @@ namespace MatrixCore
 
 
 
-        /// <summary>
-        /// Нахождение контуров
-        /// </summary>
-        /// <returns>контуры List<Сircuit></returns>
+
+
         public List<Сircuit> SearchСircuit()
         {
-            List<Сircuit> _сircuit = new List<Сircuit>();
-            bool[,] _matrix =matrix.ReachabilityMatrix= matrix.AdjacencyMatrix;// матрица хранящая возведенную в степень матрицу
-
-            for (int stage = 0; stage < matrix.SizeMatrix - 1; stage++)
-            {
-                //Перемножение номер: " + stage+1 + " \n";
-                _matrix = Matrix.MultiplicationMatrix(_matrix, matrix.AdjacencyMatrix);//перемножение матриц при помощи метода Mul
-                matrix.ReachabilityMatrix = Matrix.SummationMatrix(matrix.ReachabilityMatrix, _matrix);
-//
-                List<int> _cir =Matrix.SearchСircuitVertices(_matrix);
-                if (!_сircuit.Contains(_cir) && _cir.Count != 0)
-                {
-                    if (_cir.Count <= stage + 1)
-                        _сircuit.Add(_cir);
-                    else
-                        _сircuit.AddRange( YtochninieContyra(stage, _cir));//ytochnenie kontyra
-                }
-            }
-
-            СalculationСompleted(this, new EventMessage("Нахождение контуров завершено", cycles));
-
-            return cycles;
+            return  matrix.SearchСircuit();
         }
 
 
 
-     
 
         /// <summary>
         /// поиск разрываемых потоков
@@ -151,44 +154,35 @@ namespace MatrixCore
         {
             Dictionary<Current, List<Сircuit>> _dict = new Dictionary<Current, List<Сircuit>>();
 
-            List<Сircuit> _circuits = circuits;
-            Сircuit generalСircuit = new Сircuit(new List<Current>());
+            List<Сircuit> list;
+
+               Сircuit generalСircuit = new Сircuit(new List<Current>());
             foreach (Сircuit circuit in circuits)
                 foreach (Current item in circuit.CurrentList)
                 {
                     generalСircuit.AddСircuitItem(item);
                 }
 
-            while (_circuits.Count != 0)
+
+            foreach (Current item in generalСircuit.CurrentList)
             {
+                list = new List<Сircuit>();
+                foreach (Сircuit circuit in circuits)
+                    if (circuit.CurrentList.Where(i => i.StartingPoint == item.StartingPoint && i.FinalPoint == item.FinalPoint).ToList().Count != 0)
+                        list.Add(circuit);
 
-                List<Сircuit> _item = new List<Сircuit>();
-
-
-                Current maxitem= generalСircuit.CurrentList.Where(obj => obj.Amount == generalСircuit.CurrentList.Max(i => i.Amount)).First();
-
-
-                foreach (Сircuit circuit in _circuits)
-                {
-                    if (circuit.CurrentList.IndexOf(maxitem) != -1)
-                    {
-                        _item.Add(circuit);
-                        _circuits.Remove(circuit);
-                    }
-                }
-
-                _dict.Add(maxitem, _item);
-
-              generalСircuit.CurrentList.Remove(maxitem);
+                _dict.Add(item, list);
             }
 
-            СalculationСompleted(this, new EventMessage("Нахождение разрываемых потоков завершено", _dict));
+
+
+             СalculationСompleted(this,new EventMessage("Нахождение потоков завершено"));
             return _dict;
         }
 
 
 
-
+       
 
     }
 

@@ -8,25 +8,24 @@ namespace MatrixCore
     /// <summary>
     /// Контур
     /// </summary>
-    public class Сircuit
+  public  class Сircuit
     {
         private List<Current> _currentList;
         public List<Current> CurrentList
         {
             get
             {
-                // return _currentList.OrderBy(x => x.Position).ToList();
-                _currentList.Sort();
-                return _currentList;
+                 return _currentList.OrderBy(x => x.Position).ToList();
+
             }
 
         }
 
         public void AddСircuitItem(Current item)
         {
-            int index = _currentList.IndexOf(item);
-            if (index != -1)
-                _currentList[index].Amount++;
+            Current cur = _currentList.Where(i => i.StartingPoint == item.StartingPoint && i.FinalPoint == item.FinalPoint).FirstOrDefault();
+            if (cur != null)
+                _currentList[_currentList.IndexOf(cur)].Amount++;
             else
                 _currentList.Add(item);
         }
@@ -47,12 +46,20 @@ namespace MatrixCore
         /// <param name="_adjacencyMatrix">матрица смежности</param>
         public Сircuit(List<int> _сircuit, bool[,] _adjacencyMatrix)
         {
-            List<Current> _currentList = new List<Current>();
+         //neobhodim graf gentq
 
-            foreach (int item in _сircuit)
-                for (int width = 0; width < _adjacencyMatrix.Length; width++)
-                    if (_adjacencyMatrix[item, width] == true && _сircuit.Contains(width))
-                        _currentList.Add(new Current(item, item, width));
+          
+
+            _currentList = new List<Current>();
+
+            for (int i = 0; i < _сircuit.Count; i++)
+            {
+                if(i+1== _сircuit.Count)
+                _currentList.Add(new Current(i, _сircuit[i], _сircuit[0]));
+                else
+                    _currentList.Add(new Current(i, _сircuit[i], _сircuit[i+1]));
+            }
+
 
         }
     
