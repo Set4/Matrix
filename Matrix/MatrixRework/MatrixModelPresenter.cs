@@ -10,40 +10,77 @@ namespace MatrixRework
     class MatrixModelPresenter
     {
 
-        private MainWindow view = null;
-        private MatrixModel model = null;
+        private IView view = null;
+        private IMatrixModel model = null;
 
 
-        public MatrixModelPresenter(MainWindow view, MatrixModel model)
+        public MatrixModelPresenter(IView view, IMatrixModel model)
         {
             this.view = view;
             this.model = model;
+
+
+
+            model.EndSearchTornCurrent += Model_EndSearchTornCurrent;
+            model.EndSearchСircuit += Model_EndSearchСircuit;
+
+            model.StartSearchTornCurrent += Model_StartSearchTornCurrent;
+            model.StartSearchСircuit += Model_StartSearchСircuit;
+
+            model.StepSearchTornCurrent += Model_StepSearchTornCurrent;
+            model.StepSearchСircuit += Model_StepSearchСircuit;
         }
 
 
-        public void Proverka(string[,] matrix)
+
+        private void Model_StepSearchСircuit(object sender, EventMessage e)
         {
-            
+            view.StatusView(e.Message, Convert.ToInt32(e.Item));
         }
 
-        public void CreateMatrix()
+        private void Model_StepSearchTornCurrent(object sender, EventMessage e)
         {
+            view.StatusView(e.Message, Convert.ToInt32(e.Item));
+        }
+
+        private void Model_StartSearchСircuit(object sender, EventMessage e)
+        {
+            view.StatusView(e.Message,0);
+        }
+
+        private void Model_StartSearchTornCurrent(object sender, EventMessage e)
+        {
+            view.StatusView(e.Message,0);
+        }
+
+
+
+        private void Model_EndSearchСircuit(object sender, EventMessage e)
+        {
+            view.StatusView(e.Message, 100);
+
+
             string s="";
-            string s1 = "";
-            model.CreateMatrix(view.ReadTable().Length, view.ReadTable().Length, model.ConvertMatrixToBool(view.ReadTable()));
             int i = 0;
-            foreach (Сircuit c in model.SearchСircuit())
+            foreach (Сircuit c in e.Item as List<Сircuit>)
             {
                 s += i + ": ";
                 foreach (Current cur in c.CurrentList)
                 {
                     s += cur.StartingPoint + "-" + cur.FinalPoint;
                 }
-                s += "\r\n";i++;
+                s += "\r\n"; i++;
             }
-            view.vievCirkuit(s);
+            view.ViewСircuit(s);
+        }
 
-            foreach (KeyValuePair<Current, List<Сircuit>> cur in model.SearchTornCurrent(model.SearchСircuit()))
+        private void Model_EndSearchTornCurrent(object sender, EventMessage e)
+        {
+            view.StatusView(e.Message, 100);
+
+            string s1 = "";
+          
+            foreach (KeyValuePair<Current, List<Сircuit>> cur in e.Item as Dictionary<Current, List<Сircuit>>)
             {
                 s1 += cur.Key.StartingPoint + "-" + cur.Key.FinalPoint + ";\n";
                 foreach (Сircuit c in cur.Value)
@@ -57,7 +94,39 @@ namespace MatrixRework
                 s1 += "\n";
             }
 
-            view.vievrazrivi(s1);
+            view.ViewTornCurrent(s1);
         }
+
+
+
+
+
+
+        public async void SearthAll(string[,] matrix)
+        {
+            model.CreateMatrix(matrix.GetLength(0), matrix.GetLength(0), model.ConvertMatrixToBool(matrix));
+
+            List<Сircuit> _circ = await model.SearchСircuitAsync();
+            await model.SearchTornCurrentAsync(_circ);
+        }
+
+        public async void SearthSearchСircuit(string[,] matrix)
+        {
+            model.CreateMatrix(matrix.GetLength(0), matrix.GetLength(0), model.ConvertMatrixToBool(matrix));
+            await model.SearchСircuitAsync();
+            
+        }
+
+
+    
+
+
+
+        public void Proverka(string[,] matrix)
+        {
+            
+        }
+
+      
     }
 }

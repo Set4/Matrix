@@ -102,34 +102,37 @@ namespace MatrixCore
             {
 
 
+
+
+
                 for (int stage = 2; stage < SizeMatrix + 1; stage++)
+            {
+                StepSearchСircuit(this, new EventMessage("Step: " + stage.ToString(), stage));
+
+                //Перемножение номер: " + stage+1 + " \n";
+                _matrix = MatrixMethods.MultiplicationMatrix(_matrix, AdjacencyMatrix);//перемножение матриц при помощи метода Mul
+                ReachabilityMatrix = MatrixMethods.SummationMatrix(ReachabilityMatrix, _matrix);
+                //
+                List<int> _cir = MatrixMethods.SearchСircuitVertices(_matrix);
+                if (!_items.Contains(_cir) && _cir.Count != 0)
                 {
-                    StepSearchСircuit(this, new EventMessage("Step: " + stage.ToString(), stage * 100 / SizeMatrix));
 
-                    //Перемножение номер: " + stage+1 + " \n";
-                    _matrix = MatrixMethods.MultiplicationMatrix(_matrix, AdjacencyMatrix);//перемножение матриц при помощи метода Mul
-                    ReachabilityMatrix = MatrixMethods.SummationMatrix(ReachabilityMatrix, _matrix);
-                    //
-                    List<int> _cir = MatrixMethods.SearchСircuitVertices(_matrix);
-                    if (!_items.Contains(_cir) && _cir.Count != 0)
+
+                    if (_cir.Count <= stage)
                     {
+                        _сircuit.Add(new Сircuit(_cir, AdjacencyMatrix));
+                        _items.Add(_cir);
+                    }
+                    else
+                    {
+                        List<List<int>> _it= FragmentationCircuit(stage, _cir);
+                        _items.AddRange(_it);
 
-
-                        if (_cir.Count <= stage)
-                        {
-                            _сircuit.Add(new Сircuit(_cir, AdjacencyMatrix));
-                            _items.Add(_cir);
-                        }
-                        else
-                        {
-                            List<List<int>> _it = FragmentationCircuit(stage, _cir);
-                            _items.AddRange(_it);
-
-                            foreach (List<int> i in _it)
-                                _сircuit.Add(new Сircuit(i, AdjacencyMatrix));
-                        }
+                        foreach(List<int> i in _it)
+                        _сircuit.Add(new Сircuit(i, AdjacencyMatrix));
                     }
                 }
+            }
 
 
            

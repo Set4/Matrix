@@ -113,7 +113,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MatrixCore\MatrixCore.csproj">
-      <Project>{8b87509d-f0c9-4bee-8d6b-e99e330622f3}</Project>
+      <Project>{5de8a308-699d-41e7-aa4e-50a0d317d3cf}</Project>
       <Name>MatrixCore</Name>
     </ProjectReference>
   </ItemGroup>

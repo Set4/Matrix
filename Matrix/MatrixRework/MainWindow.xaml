@@ -52,11 +52,11 @@
                     <MenuItem Header="Выход" Click="MenuItemExit_Click" ></MenuItem>
             
                 </MenuItem>
-                <MenuItem Header="Вычисление" >
+                <MenuItem Header="Вычисление" x:Name="menu_Searth">
 
-                    <MenuItem Header="Вычисление Контура" ></MenuItem>
-                    <MenuItem Header="Вычисление Мест Разрыва" ></MenuItem>
-                    <MenuItem Header="Вычисление" Click="MenuItemVichislenieVsego_Click" ></MenuItem>
+                    <MenuItem Header="Вычисление Контура" Click="MenuItemSearchСircuit_Click"></MenuItem>
+
+                    <MenuItem Header="Вычисление Контура/Мест Разрыва" Click="btn_SearthAll_Click" ></MenuItem>
                 </MenuItem>
                 
             <MenuItem Click="MenuItemInfo_Click" Header="Информация" ></MenuItem>
@@ -89,7 +89,7 @@
               
               
                 <Separator />
-                <Button>
+                <Button x:Name="btn_SearthAll" Click="btn_SearthAll_Click">
                     <StackPanel Orientation="Horizontal">
                         <Ellipse Width="10" Height="10" Fill="Red"  HorizontalAlignment="Left"/>
                         <TextBlock HorizontalAlignment="Right" Width="60" Margin="5 0 0 0">Вычислить</TextBlock>
@@ -182,7 +182,7 @@
                                   VerticalScrollBarVisibility="Auto"
                                   HorizontalScrollBarVisibility="Disabled">
                         <TextBlock 
-                        x:Name="textBlock" 
+                        x:Name="txBlock_Сircuit" 
                         HorizontalAlignment="Stretch" 
                         Margin="5" 
                         TextWrapping="Wrap" 
@@ -198,7 +198,7 @@
                                   VerticalScrollBarVisibility="Auto"
                                   HorizontalScrollBarVisibility="Disabled">
                         <TextBlock 
-                        x:Name="textBlock1" 
+                        x:Name="txBlock_TornCurrent" 
                         HorizontalAlignment="Stretch" 
                         TextWrapping="Wrap" 
                       
@@ -218,7 +218,7 @@
             Grid.Row="2">
 
             <TextBlock 
-                        x:Name="textBlock2" 
+                        x:Name="txblock_status" 
                         HorizontalAlignment="Stretch" 
                         Margin="5" 
                         TextWrapping="NoWrap" 
@@ -226,7 +226,10 @@
                         Text="{Binding Path=status}"
                         VerticalAlignment="Stretch"/>
             <ProgressBar 
+                x:Name="prgbar_status"
                 HorizontalAlignment="Right"
+                Maximum="100"
+                Minimum="0"
                 Margin="5,0,10,0"
                 Height="10" 
                 Width="200"/>

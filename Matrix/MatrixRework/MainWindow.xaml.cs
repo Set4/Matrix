@@ -16,15 +16,24 @@ using System.Windows.Shapes;
 
 namespace MatrixRework
 {
-    /// <summary>
-    /// Логика взаимодействия для MainWindow.xaml
-    /// </summary>
-    public partial class MainWindow : Window
+  public interface IView
+    {
+        void StatusView(string status, int step);
+
+        void ViewСircuit(string s);
+        void ViewTornCurrent(string s);
+
+        void ViewTable(int[,] matrix);
+
+    } 
+
+
+    public partial class MainWindow : Window, IView
     {
 
         string info = "Дипломная работа.\n\"Разработка программного обеспечения для определения оптимальной структуры жизненного цикла информационных и технических систем.\" \n Студентки группы: ТРП-1-12 \n Алины Анисимовой";
 
-      public string Status { get; set; }
+        List<Tuple<int,int>> BadCells;
 
          MatrixModelPresenter presenter;
       
@@ -34,9 +43,41 @@ namespace MatrixRework
 
             presenter = new MatrixModelPresenter(this, new MatrixCore.MatrixModel());
 
+            BadCells = new List<Tuple<int, int>>();
         }
 
       
+
+        public void StatusView(string status, int step)
+        {
+            txblock_status.Text = status;
+            prgbar_status.Value = step;
+        }
+
+
+
+        public void ViewСircuit(string s)
+        {
+            txBlock_Сircuit.Text = s;
+
+        }
+
+        public void ViewTornCurrent(string s)
+        {
+            txBlock_TornCurrent.Text = s;
+        }
+
+
+
+
+
+
+
+       
+
+
+
+
 
         private void MenuItemExit_Click(object sender, RoutedEventArgs e)
         {
@@ -97,69 +138,89 @@ namespace MatrixRework
                 }
             }
 
-            Status = "created new matrix[" + size + "," + size + "]";
+            txblock_status.Text = "created new matrix[" + size + "," + size + "]";
         }
 
 
 
 
-        private void dgvTable_CellEndEdit(object sender, System.Windows.Forms.DataGridViewCellEventArgs e)
+     
+
+         private string[,] ReadTable()
         {
-
-        }
-
+            //  string[,] table = new string[4, 4] { { "0", "1", "0", "0" }, { "1", "0", "1", "0" }, { "0", "0", "0", "1" }, { "1", "0", "1", "0" } };
 
 
+            dgvTable.EndEdit();
 
-         public string[,] ReadTable()
-        {
-            string[,] table = new string[4, 4] { { "0", "1", "0", "0" }, { "1", "0", "1", "0" }, { "0", "0", "0", "1" }, { "1", "0", "1", "0" } };
 
-            //string[,] table = new string[4, 4];
-            //for (int rows = 0; rows < dgvTable.Rows.Count; rows++)
-            //{
-            //    for (int col = 0; col < dgvTable.Rows[rows].Cells.Count; col++)
-            //    {
-            //        table[rows,col] = dgvTable.Rows[rows].Cells[col].Value.ToString();
+            string[,] table = new string[4, 4];
+            for (int rows = 0; rows < dgvTable.Rows.Count; rows++)
+            {
+                for (int col = 0; col < dgvTable.Rows[rows].Cells.Count; col++)
+               {
+                    table[rows,col] = dgvTable.Rows[rows].Cells[col].Value.ToString();
 
-            //    }
-            //}
+                }
+            }
 
             return table;
         }
 
 
+    
 
-        public void ReSizeTable(int size)
+        private void btn_SearthAll_Click(object sender, RoutedEventArgs e)
         {
+            presenter.SearthAll(ReadTable());
+        }
 
+        private void MenuItemSearchСircuit_Click(object sender, RoutedEventArgs e)
+        {
+            presenter.SearthSearchСircuit(ReadTable());
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+
+
+
+        private void dgvTable_CellEndEdit(object sender, System.Windows.Forms.DataGridViewCellEventArgs e)
+        {
+            ViewBadCell( e.RowIndex,e.ColumnIndex);
         }
 
 
         public void ViewBadCell(int row, int columm)
         {
-            dgvTable.Rows[row].Cells[columm].Style.BackColor = System.Drawing.Color.Red;
-        }
-
-        
-      public void vievCirkuit(string s)
-        {
-            textBlock.Text = s;
-        }
-
-        public void vievrazrivi(string s)
-        {
-            textBlock1.Text = s;
-        }
-
-        private void ViewTable(int[,] matrix)
-        {
-            for (int i = 0; i < matrix.Length; i++)
+            if (dgvTable.Rows[row].Cells[columm].Value.ToString() != String.Empty
+                 || dgvTable.Rows[row].Cells[columm].Value.ToString() != "1"
+                 || dgvTable.Rows[row].Cells[columm].Value.ToString() != "0")
             {
-                for (int j = 0; j < matrix.Length; j++)
-                {
-                    dgvTable.Rows[j].Cells[i].Value = matrix[i, j];
-                }
+                dgvTable.Rows[row].Cells[columm].Style.BackColor = System.Drawing.Color.Red;
+                BadCells.Add(new Tuple<int, int>(row, columm));
+            }
+            else
+            {
+                dgvTable.Rows[row].Cells[columm].Style.BackColor = System.Drawing.Color.WhiteSmoke;
+                BadCells.Remove(new Tuple<int, int>(row, columm));
             }
         }
 
@@ -175,16 +236,50 @@ namespace MatrixRework
 
 
 
-        private void numudSizeMatrix_KeyPress(object sender, System.Windows.Forms.KeyPressEventArgs e)
+
+
+
+
+
+    public void ViewTable(int[,] matrix)
+        {
+            for (int i = 0; i < matrix.Length; i++)
+            {
+                for (int j = 0; j < matrix.Length; j++)
+                {
+                    dgvTable.Rows[j].Cells[i].Value = matrix[i, j];
+                }
+            }
+        }
+
+
+ public void ReSizeTable(int size)
+        {
+
+        }
+
+
+   private void numudSizeMatrix_KeyPress(object sender, System.Windows.Forms.KeyPressEventArgs e)
         {
             CreateTable((int)numudSizeMatrix.Value);
 
         }
 
-        private void MenuItemVichislenieVsego_Click(object sender, RoutedEventArgs e)
-        {
-            presenter.CreateMatrix();
-        }
+
+
+
+
+
+
+
+
+   
+
+
+
+
+
+     
 
         //private void dataGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
         //{
