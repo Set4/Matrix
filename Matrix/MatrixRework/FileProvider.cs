@@ -1,9 +1,11 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Windows;
 
 
@@ -12,59 +14,76 @@ using Excel = Microsoft.Office.Interop.Excel;
 
 namespace MatrixRework
 {
-    public  class FileProvider
+    public static  class FileProvider
     {
 
-        public List<List<string>> ReadFile(string path)
+        public async static Task<List<List<string>>> ReadFile()
         {
             List<List<string>> _matrix = new List<List<string>>();
 
-            Regex newReg = new Regex("\\d+");//только числа
+            OpenFileDialog opn = new OpenFileDialog();
+            opn.Filter = "txt files (*.txt)|*.txt";
+            Stream myStream;
 
-            try
+   Regex newReg = new Regex("\\d+");//только числа
+
+            if ((myStream = opn.OpenFile()) != null)
             {
-                string[] lines = File.ReadAllLines(path);
-
-                foreach (string line in lines)
+                using (StreamReader rd = new StreamReader(opn.OpenFile()))
                 {
-                    List<string> s = new List<string>();
-                    MatchCollection matches = newReg.Matches(line);
-                    foreach (Match m in matches)
+
+                    string line;
+                    while ((line = await rd.ReadLineAsync()) != null)
                     {
-                        s.Add(m.ToString());
+                        List<string> s = new List<string>();
+                        MatchCollection matches = newReg.Matches(line);
+                        foreach (Match m in matches)
+                        {
+                            s.Add(m.ToString());
+                        }
+                        _matrix.Add(s);
                     }
-                    _matrix.Add(s);
+
 
                 }
+
+                myStream.Close();
             }
-            catch (Exception ex)
-            {
-                MessageBoxResult result = MessageBox.Show("Ошибка чтения файла.\n" + ex.Message.ToString(), "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-
-                //              if (MessageBox.Show("Do you want to close this window?",
-                //"Confirmation", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
-                //              {
-                //                  // Close the window
-                //              }
-                //              else
-                //              {
-                //                  // Do not close the window
-                //              }
-
-                //+++Событие
-
-                return null;
-            }
-
+            else
+                MessageBox.Show("При открытии файла произошла ошибка.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
 
             return _matrix;
 
         }
 
-     
+
+        public static async void SaveFileHow(string file)
+        {
+            Stream myStream;
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+
+            saveFileDialog.Filter = "txt files (*.txt)|*.txt";
+            saveFileDialog.FilterIndex = 0;
+            saveFileDialog.RestoreDirectory = true;
+
+            if ((myStream = saveFileDialog.OpenFile()) != null)
+            {
+                using (StreamWriter wr = new StreamWriter(saveFileDialog.OpenFile()))
+                {
+                    await  wr.WriteAsync(file);
+                    wr.Close();
+                }
+
+                myStream.Close();
+            }
+            MessageBox.Show("Файл успешно сохранен", "Сохранен", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+
+    
+
     }
 
-  public  class ExelProvider
+  public static class ExelProvider
     {
         //excel oledb
         /*
@@ -114,31 +133,41 @@ namespace MatrixRework
 
 
 
-        public string[,] ReadExcelFile(string path)
+        public static string[,] ReadExcelFile()
         {
-            Excel.Application ObjWorkExcel = new Excel.Application(); //открыть эксель
-            Excel.Workbook ObjWorkBook = ObjWorkExcel.Workbooks.Open(path, 
-                Type.Missing, Type.Missing, Type.Missing, 
-                Type.Missing, Type.Missing, Type.Missing,
-                Type.Missing, Type.Missing, Type.Missing,
-                Type.Missing, Type.Missing, Type.Missing,
-                Type.Missing, Type.Missing); //открыть файл
+            OpenFileDialog opn = new OpenFileDialog();
+            opn.Filter = "Exel files 03 (*.xls)|*.xls|Exel files 07 (*.XLSX*)|*.xlsx";
+            if (opn.OpenFile() == null)
+            {
+                MessageBox.Show("При открытии файла произошла ошибка.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                return null;
+            }
+            else
+            {
+                Excel.Application ObjWorkExcel = new Excel.Application(); //открыть эксель
+                Excel.Workbook ObjWorkBook = ObjWorkExcel.Workbooks.Open(opn.OpenFile().ToString(),
+                    Type.Missing, Type.Missing, Type.Missing,
+                    Type.Missing, Type.Missing, Type.Missing,
+                    Type.Missing, Type.Missing, Type.Missing,
+                    Type.Missing, Type.Missing, Type.Missing,
+                    Type.Missing, Type.Missing); //открыть файл
 
-            Excel.Worksheet ObjWorkSheet = (Excel.Worksheet)ObjWorkBook.Sheets[1]; //получить 1 лист
+                Excel.Worksheet ObjWorkSheet = (Excel.Worksheet)ObjWorkBook.Sheets[1]; //получить 1 лист
 
-            var lastCell = ObjWorkSheet.Cells.SpecialCells(Excel.XlCellType.xlCellTypeLastCell);//1 ячейку
-            string[,] list = new string[(int)lastCell.Column, (int)lastCell.Row]; // массив значений с листа равен по размеру листу
+                var lastCell = ObjWorkSheet.Cells.SpecialCells(Excel.XlCellType.xlCellTypeLastCell);//1 ячейку
+                string[,] list = new string[(int)lastCell.Column, (int)lastCell.Row]; // массив значений с листа равен по размеру листу
 
-            for (int i = 0; i < (int)lastCell.Column; i++) //по всем колонкам
-                for (int j = 0; j < (int)lastCell.Row; j++) // по всем строкам
-                    list[i, j] = ObjWorkSheet.Cells[j + 1, i + 1].Text.ToString();//считываем текст в строку
+                for (int i = 0; i < (int)lastCell.Column; i++) //по всем колонкам
+                    for (int j = 0; j < (int)lastCell.Row; j++) // по всем строкам
+                        list[i, j] = ObjWorkSheet.Cells[j + 1, i + 1].Text.ToString();//считываем текст в строку
 
-            ObjWorkBook.Close(false, Type.Missing, Type.Missing); //закрыть не сохраняя
-            ObjWorkExcel.Quit(); // выйти из экселя
-            GC.Collect(); // убрать за собой
+                ObjWorkBook.Close(false, Type.Missing, Type.Missing); //закрыть не сохраняя
+                ObjWorkExcel.Quit(); // выйти из экселя
+                GC.Collect(); // убрать за собой
 
 
-            return list;
+                return list;
+            }
         }
 
 

@@ -86,7 +86,8 @@ namespace MatrixCore
 
         public MatrixModel()
         {
-            matrix.StepSearchСircuit += Matrix_StepSearchСircuit;
+           
+            
         }
 
       
@@ -108,6 +109,7 @@ namespace MatrixCore
             {
 
                 matrix = new Matrix(_matrix);
+                matrix.StepSearchСircuit += Matrix_StepSearchСircuit;
                 return true;
             }
             else

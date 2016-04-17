@@ -42,12 +42,12 @@
                 <MenuItem Header="Файл">
                 <MenuItem Header="Создать" Click="MenuItemNewFile_Click" ></MenuItem>
                 <MenuItem Header="Открыть" >
-                    <MenuItem Header="Открыть .txt"></MenuItem>
-                        <MenuItem Header="Открыть Excel" ></MenuItem>
-                </MenuItem>
+                        <MenuItem Header="Открыть .txt" Click="MenuItemOpentxtFile_Click"/>
+                        <MenuItem Header="Открыть Excel" Click="MenuItemOpenExcelFile_Click" />
+                    </MenuItem>
                     <Separator />
-                    <MenuItem Header="Сохранить" />
-                    <MenuItem Header="Сохранить как" />
+
+                    <MenuItem Header="Сохранить как" Click="MenuItemSavetxtFile_Click"/>
                     <Separator />
                     <MenuItem Header="Выход" Click="MenuItemExit_Click" ></MenuItem>
             
@@ -82,7 +82,8 @@
                         x:Name="numudSizeMatrix" 
                         Minimum="1" 
                         AutoSize="True"
-                       KeyPress="numudSizeMatrix_KeyPress" />
+                      
+                        ValueChanged="numudSizeMatrix_ValueChanged"/>
                     
                 </WindowsFormsHost>
 

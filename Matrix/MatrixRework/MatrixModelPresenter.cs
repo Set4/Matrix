@@ -119,14 +119,22 @@ namespace MatrixRework
 
 
     
-
-
-
-        public void Proverka(string[,] matrix)
+        public async Task<List<List<string>>> OpentxtFile()
         {
-            
+          return await FileProvider.ReadFile();
         }
 
-      
+
+
+        public string[,] OpenExcelFile()
+        {
+            return  ExelProvider.ReadExcelFile();
+        }
+
+        public void SavetxtFile(string file)
+        {
+            FileProvider.SaveFileHow(file);
+        }
+
     }
 }

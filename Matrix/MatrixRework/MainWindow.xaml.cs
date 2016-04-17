@@ -31,6 +31,8 @@ namespace MatrixRework
     public partial class MainWindow : Window, IView
     {
 
+        decimal SizeTable = 0;
+
         string info = "Дипломная работа.\n\"Разработка программного обеспечения для определения оптимальной структуры жизненного цикла информационных и технических систем.\" \n Студентки группы: ТРП-1-12 \n Алины Анисимовой";
 
         List<Tuple<int,int>> BadCells;
@@ -44,6 +46,8 @@ namespace MatrixRework
             presenter = new MatrixModelPresenter(this, new MatrixCore.MatrixModel());
 
             BadCells = new List<Tuple<int, int>>();
+
+         
         }
 
       
@@ -114,6 +118,8 @@ namespace MatrixRework
 
         public void CreateTable(int size)
         {
+            SizeTable = size;
+
             dgvTable.Columns.Clear(); //удаляем ранее созданые столбцы
 
             int n = 1;
@@ -150,7 +156,7 @@ namespace MatrixRework
         {
             //  string[,] table = new string[4, 4] { { "0", "1", "0", "0" }, { "1", "0", "1", "0" }, { "0", "0", "0", "1" }, { "1", "0", "1", "0" } };
 
-
+            dgvTable.Update();
             dgvTable.EndEdit();
 
 
@@ -219,7 +225,10 @@ namespace MatrixRework
             }
             else
             {
-                dgvTable.Rows[row].Cells[columm].Style.BackColor = System.Drawing.Color.WhiteSmoke;
+                if(row==columm)
+                dgvTable.Rows[row].Cells[columm].Style.BackColor = System.Drawing.Color.LightGray;
+                else
+                    dgvTable.Rows[row].Cells[columm].Style.BackColor = System.Drawing.Color.White;
                 BadCells.Remove(new Tuple<int, int>(row, columm));
             }
         }
@@ -253,16 +262,89 @@ namespace MatrixRework
         }
 
 
- public void ReSizeTable(int size)
+        private void ReSizeTable(decimal size)
         {
+            if (SizeTable > 0&& size!= SizeTable)
+            {
+                if (size > SizeTable)
+                {
+                    int n = 1;
+                    for (int i = Convert.ToInt32(SizeTable) - 1; i < size; i++)
+                    {
+                        dgvTable.Columns.Add("" + n, "" + n); //добавляем столбцы
+                        dgvTable.Rows.Add(); //добавляем строки
+                        dgvTable.Rows[i].HeaderCell.Value = "" + n;
+                        n++;
+                    }
 
+                    for (int i = 0; i < size; i++)
+                    {
+                        for (int j = 0; j < size; j++)
+                        {
+                            if (i == j)
+                            {
+                                dgvTable.Rows[j].Cells[i].Style.BackColor = System.Drawing.Color.LightGray;
+
+                            }
+
+                        }
+                    }
+
+
+
+                }
+                else
+                {
+
+                    for (int i = Convert.ToInt32(SizeTable) - 1; i < size; i--)
+                    {
+                        dgvTable.Columns.RemoveAt(i);
+                        dgvTable.Rows.RemoveAt(i);
+                    }
+                }
+                txblock_status.Text = "размер matrix[" + SizeTable + ", " + SizeTable + "] изменен на matrix[" + numudSizeMatrix.Value + "," + numudSizeMatrix.Value + "]";
+                SizeTable = size;
+            }
         }
 
 
-   private void numudSizeMatrix_KeyPress(object sender, System.Windows.Forms.KeyPressEventArgs e)
+        private void numudSizeMatrix_KeyPress(object sender, System.Windows.Forms.KeyPressEventArgs e)
         {
-            CreateTable((int)numudSizeMatrix.Value);
+           
 
+        }
+
+        private async void MenuItemOpentxtFile_Click(object sender, RoutedEventArgs e)
+        {
+            List<List<string>> items = await presenter.OpentxtFile();
+            CreateTable(items.Count);
+            for (int i = 0; i < items.Count; i++)
+            {
+                List<string> item = items[i];
+                for (int j = 0; j < items.Count || j < items[i].Count; j++)
+                    dgvTable.Rows[i].Cells[j].Value = items[i][j];
+            }
+        }
+
+        private void MenuItemOpenExcelFile_Click(object sender, RoutedEventArgs e)
+        {
+            string[,] items = presenter.OpenExcelFile();
+            CreateTable(items.GetLength(0));
+            for (int i = 0; i < items.GetLength(0); i++)
+                for (int j = 0; j < items.GetLength(1); j++)
+                    dgvTable.Rows[i].Cells[j].Value = items[i,j];
+            
+        }
+
+        private void MenuItemSavetxtFile_Click(object sender, RoutedEventArgs e)
+        {
+            presenter.SavetxtFile(ReadTable() + "\n" + txBlock_Сircuit.Text + "\n" + txBlock_TornCurrent.Text);
+        }
+
+        private void numudSizeMatrix_ValueChanged(object sender, EventArgs e)
+        {
+ ReSizeTable(numudSizeMatrix.Value);
+           
         }
 
 
@@ -273,13 +355,13 @@ namespace MatrixRework
 
 
 
-   
 
 
 
 
 
-     
+
+
 
         //private void dataGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
         //{
