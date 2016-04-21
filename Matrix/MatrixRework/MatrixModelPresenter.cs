@@ -119,21 +119,21 @@ namespace MatrixRework
 
 
     
-        public async Task<List<List<string>>> OpentxtFile()
+        public async Task<List<List<string>>> OpentxtFile(string path)
         {
-          return await FileProvider.ReadFile();
+          return await FileProvider.ReadFile(path);
         }
 
 
 
-        public string[,] OpenExcelFile()
+        public string[,] OpenExcelFile(string path)
         {
-            return  ExelProvider.ReadExcelFile();
+            return  ExelProvider.ReadExcelFile(path);
         }
 
-        public void SavetxtFile(string file)
+        public void SavetxtFile(string file, string path)
         {
-            FileProvider.SaveFileHow(file);
+            FileProvider.SaveFileHow(file, path);
         }
 
     }

@@ -17,19 +17,16 @@ namespace MatrixRework
     public static  class FileProvider
     {
 
-        public async static Task<List<List<string>>> ReadFile()
+        public async static Task<List<List<string>>> ReadFile(string path)
         {
             List<List<string>> _matrix = new List<List<string>>();
 
-            OpenFileDialog opn = new OpenFileDialog();
-            opn.Filter = "txt files (*.txt)|*.txt";
-            Stream myStream;
+          
 
-   Regex newReg = new Regex("\\d+");//только числа
+            Regex newReg = new Regex("\\d+");//только числа
 
-            if ((myStream = opn.OpenFile()) != null)
-            {
-                using (StreamReader rd = new StreamReader(opn.OpenFile()))
+           
+                using (StreamReader rd = new StreamReader(path))
                 {
 
                     string line;
@@ -47,35 +44,23 @@ namespace MatrixRework
 
                 }
 
-                myStream.Close();
-            }
-            else
-                MessageBox.Show("При открытии файла произошла ошибка.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+    
 
             return _matrix;
 
         }
 
 
-        public static async void SaveFileHow(string file)
+        public static async void SaveFileHow(string file, string path)
         {
-            Stream myStream;
-            SaveFileDialog saveFileDialog = new SaveFileDialog();
-
-            saveFileDialog.Filter = "txt files (*.txt)|*.txt";
-            saveFileDialog.FilterIndex = 0;
-            saveFileDialog.RestoreDirectory = true;
-
-            if ((myStream = saveFileDialog.OpenFile()) != null)
-            {
-                using (StreamWriter wr = new StreamWriter(saveFileDialog.OpenFile()))
+           
+                using (StreamWriter wr = new StreamWriter(path))
                 {
                     await  wr.WriteAsync(file);
                     wr.Close();
                 }
 
-                myStream.Close();
-            }
+                
             MessageBox.Show("Файл успешно сохранен", "Сохранен", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
@@ -133,19 +118,12 @@ namespace MatrixRework
 
 
 
-        public static string[,] ReadExcelFile()
+        public static string[,] ReadExcelFile(string path)
         {
-            OpenFileDialog opn = new OpenFileDialog();
-            opn.Filter = "Exel files 03 (*.xls)|*.xls|Exel files 07 (*.XLSX*)|*.xlsx";
-            if (opn.OpenFile() == null)
-            {
-                MessageBox.Show("При открытии файла произошла ошибка.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                return null;
-            }
-            else
-            {
+            
+           
                 Excel.Application ObjWorkExcel = new Excel.Application(); //открыть эксель
-                Excel.Workbook ObjWorkBook = ObjWorkExcel.Workbooks.Open(opn.OpenFile().ToString(),
+                Excel.Workbook ObjWorkBook = ObjWorkExcel.Workbooks.Open(path,
                     Type.Missing, Type.Missing, Type.Missing,
                     Type.Missing, Type.Missing, Type.Missing,
                     Type.Missing, Type.Missing, Type.Missing,
@@ -167,7 +145,7 @@ namespace MatrixRework
 
 
                 return list;
-            }
+            
         }
 
 
