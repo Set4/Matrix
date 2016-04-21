@@ -10,7 +10,13 @@ namespace MatrixCore
     /// </summary>
     public class EventMessage : EventArgs
     {
+        /// <summary>
+        /// Сообщение
+        /// </summary>
         public string Message { get; private set; }
+        /// <summary>
+        /// Посываемый объект
+        /// </summary>
         public object Item { get; private set; }
 
         public EventMessage(string message, object obj = null)

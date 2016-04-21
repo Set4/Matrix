@@ -48,8 +48,6 @@ namespace MatrixCore
         {
          //neobhodim graf gentq
 
-          
-
             _currentList = new List<Current>();
 
             for (int i = 0; i < _сircuit.Count; i++)

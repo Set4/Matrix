@@ -13,7 +13,11 @@ namespace MatrixRework
         private IView view = null;
         private IMatrixModel model = null;
 
-
+        /// <summary>
+        /// конструктор класса Presenter
+        /// </summary>
+        /// <param name="view">представление</param>
+        /// <param name="model">модель</param>
         public MatrixModelPresenter(IView view, IMatrixModel model)
         {
             this.view = view;
@@ -31,33 +35,60 @@ namespace MatrixRework
             model.StepSearchСircuit += Model_StepSearchСircuit;
         }
 
+        public event EventHandler<EventMessage> StatusEvent = delegate { };
 
 
+        /// <summary>
+        /// отображения шага вычисления контура
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Model_StepSearchСircuit(object sender, EventMessage e)
         {
-            view.StatusView(e.Message, Convert.ToInt32(e.Item));
+            StatusEvent(this, e);
+           // view.StatusView(e.Message, Convert.ToInt32(e.Item));
         }
 
+        /// <summary>
+        /// отображения шага вычисления разрыва контура
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Model_StepSearchTornCurrent(object sender, EventMessage e)
         {
-            view.StatusView(e.Message, Convert.ToInt32(e.Item));
+            StatusEvent(this, e);
+            //view.StatusView(e.Message, Convert.ToInt32(e.Item));
         }
 
+        /// <summary>
+        /// начало вычисления
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Model_StartSearchСircuit(object sender, EventMessage e)
         {
-            view.StatusView(e.Message,0);
+           // view.StatusView(e.Message,0);
         }
 
+        /// <summary>
+        /// начало вычисления
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Model_StartSearchTornCurrent(object sender, EventMessage e)
         {
-            view.StatusView(e.Message,0);
+           // view.StatusView(e.Message,0);
         }
 
 
-
+        /// <summary>
+        /// обработчик события завершения вычисления контура
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Model_EndSearchСircuit(object sender, EventMessage e)
         {
-            view.StatusView(e.Message, 100);
+           // view.StatusView(e.Message, 100);
 
 
             string s="";
@@ -74,9 +105,14 @@ namespace MatrixRework
             view.ViewСircuit(s);
         }
 
+        /// <summary>
+        /// обработчик события завершения вычисления разрыва контура
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Model_EndSearchTornCurrent(object sender, EventMessage e)
         {
-            view.StatusView(e.Message, 100);
+           // view.StatusView(e.Message, 100);
 
             string s1 = "";
           
@@ -101,7 +137,10 @@ namespace MatrixRework
 
 
 
-
+        /// <summary>
+        /// запуск вычисления контура и разрыва
+        /// </summary>
+        /// <param name="matrix"></param>
         public async void SearthAll(string[,] matrix)
         {
             model.CreateMatrix(matrix.GetLength(0), matrix.GetLength(0), model.ConvertMatrixToBool(matrix));
@@ -110,6 +149,10 @@ namespace MatrixRework
             await model.SearchTornCurrentAsync(_circ);
         }
 
+        /// <summary>
+        /// запуск вычисления контура
+        /// </summary>
+        /// <param name="matrix"></param>
         public async void SearthSearchСircuit(string[,] matrix)
         {
             model.CreateMatrix(matrix.GetLength(0), matrix.GetLength(0), model.ConvertMatrixToBool(matrix));
@@ -118,19 +161,32 @@ namespace MatrixRework
         }
 
 
-    
+    /// <summary>
+    /// открытие файла 
+    /// </summary>
+    /// <param name="path"></param>
+    /// <returns></returns>
         public async Task<List<List<string>>> OpentxtFile(string path)
         {
           return await FileProvider.ReadFile(path);
         }
 
 
-
+        /// <summary>
+        /// открытие файла 
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
         public string[,] OpenExcelFile(string path)
         {
             return  ExelProvider.ReadExcelFile(path);
         }
 
+        /// <summary>
+        /// сохранение в файл
+        /// </summary>
+        /// <param name="file"></param>
+        /// <param name="path"></param>
         public void SavetxtFile(string file, string path)
         {
             FileProvider.SaveFileHow(file, path);

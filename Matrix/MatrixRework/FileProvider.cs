@@ -16,7 +16,11 @@ namespace MatrixRework
 {
     public static  class FileProvider
     {
-
+        /// <summary>
+        /// Чтение файла содержащего матрицу из файла .txt
+        /// </summary>
+        /// <param name="path">путь к файлу</param>
+        /// <returns></returns>
         public async static Task<List<List<string>>> ReadFile(string path)
         {
             List<List<string>> _matrix = new List<List<string>>();
@@ -50,7 +54,11 @@ namespace MatrixRework
 
         }
 
-
+        /// <summary>
+        /// Сохранение в файл матрицы и решения
+        /// </summary>
+        /// <param name="file"></param>
+        /// <param name="path"></param>
         public static async void SaveFileHow(string file, string path)
         {
            
@@ -67,7 +75,7 @@ namespace MatrixRework
     
 
     }
-
+   
   public static class ExelProvider
     {
         //excel oledb
@@ -117,7 +125,11 @@ namespace MatrixRework
         */
 
 
-
+        /// <summary>
+        /// Чтение файла содержащего матрицу из файла Excel
+        /// </summary>
+        /// <param name="path">путь к файлу</param>
+        /// <returns></returns>
         public static string[,] ReadExcelFile(string path)
         {
             

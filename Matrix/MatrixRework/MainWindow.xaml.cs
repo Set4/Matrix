@@ -23,9 +23,6 @@ namespace MatrixRework
 
         void ViewСircuit(string s);
         void ViewTornCurrent(string s);
-
-      
-
     } 
 
 
@@ -33,26 +30,28 @@ namespace MatrixRework
     {
 
         decimal SizeTable = 0;
-
         string info = "Дипломная работа.\n\"Разработка программного обеспечения для определения оптимальной структуры жизненного цикла информационных и технических систем.\" \n Студентки группы: ТРП-1-12 \n Алины Анисимовой";
-
         List<Tuple<int,int>> BadCells;
 
-         MatrixModelPresenter presenter;
+
+        MatrixModelPresenter presenter;
       
+
+
         public MainWindow()
         {
             InitializeComponent();
 
             presenter = new MatrixModelPresenter(this, new MatrixCore.MatrixModel());
 
+
             BadCells = new List<Tuple<int, int>>();
 
-         
         }
 
-      
 
+
+      
         public void StatusView(string status, int step)
         {
             txblock_status.Text = status;
@@ -60,16 +59,30 @@ namespace MatrixRework
         }
 
 
-
+        /// <summary>
+        /// отображение вычисленных контуров
+        /// </summary>
+        /// <param name="s"></param>
         public void ViewСircuit(string s)
         {
-            txBlock_Сircuit.Text = s;
-
+            txBlock_Сircuit.Dispatcher.BeginInvoke(new Action(delegate ()
+             {
+                 txBlock_Сircuit.Text = s;
+             }));
         }
 
+        /// <summary>
+        /// отображение вычисленных разрывов контура
+        /// </summary>
+        /// <param name="s"></param>
         public void ViewTornCurrent(string s)
         {
-            txBlock_TornCurrent.Text = s;
+            txBlock_TornCurrent.Dispatcher.BeginInvoke(new Action(delegate ()
+           {
+               txBlock_TornCurrent.Text = s;
+           })); 
+
+               
         }
 
 
@@ -83,7 +96,11 @@ namespace MatrixRework
 
 
 
-
+        /// <summary>
+        /// выход из программы
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void MenuItemExit_Click(object sender, RoutedEventArgs e)
         {
             MessageBoxResult result = MessageBox.Show("Вы действительно хотите выйти из программы?", "Выход", MessageBoxButton.YesNo);
@@ -98,6 +115,12 @@ namespace MatrixRework
             }
         }
 
+
+        /// <summary>
+        /// информация о программе
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void MenuItemInfo_Click(object sender, RoutedEventArgs e)
         {
             MessageBox.Show(info, "Информация");
@@ -105,7 +128,11 @@ namespace MatrixRework
 
 
 
-
+        /// <summary>
+        /// создание новой пустой 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void MenuItemNewFile_Click(object sender, RoutedEventArgs e)
         {
             NewMatrixWindow inputDialog = new NewMatrixWindow();
@@ -117,6 +144,10 @@ namespace MatrixRework
 
         }
 
+        /// <summary>
+        /// создание пустой таблицы 
+        /// </summary>
+        /// <param name="size">размер</param>
         public void CreateTable(int size)
         {
             numudSizeMatrix.Value = size;
@@ -153,7 +184,10 @@ namespace MatrixRework
 
 
      
-
+        /// <summary>
+        /// чтение введенных значений
+        /// </summary>
+        /// <returns></returns>
          private string[,] ReadTable()
         {
             //  string[,] table = new string[4, 4] { { "0", "1", "0", "0" }, { "1", "0", "1", "0" }, { "0", "0", "0", "1" }, { "1", "0", "1", "0" } };
@@ -179,12 +213,21 @@ namespace MatrixRework
 
 
     
-
+        /// <summary>
+        /// запуск поиска контура и разрыва по введенным значениям
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void btn_SearthAll_Click(object sender, RoutedEventArgs e)
         {
             presenter.SearthAll(ReadTable());
         }
 
+        /// <summary>
+        /// запуск поиска контура  по введенным значениям
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void MenuItemSearchСircuit_Click(object sender, RoutedEventArgs e)
         {
             presenter.SearthSearchСircuit(ReadTable());
@@ -193,25 +236,11 @@ namespace MatrixRework
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
-
-
-
+        /// <summary>
+        /// обработчик события завершение ввода значения в ячейку
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void dgvTable_CellEndEdit(object sender, System.Windows.Forms.DataGridViewCellEventArgs e)
         {
             ViewBadCell( e.RowIndex,e.ColumnIndex);
@@ -219,12 +248,17 @@ namespace MatrixRework
 
 
 
-
+        /// <summary>
+        /// нахождение неверного значения
+        /// </summary>
+        /// <param name="row"></param>
+        /// <param name="columm"></param>
         public void ViewBadCell(int row, int columm)
         {
-            if (dgvTable.Rows[row].Cells[columm].Value.ToString() == String.Empty
+            if (dgvTable.Rows[row].Cells[columm].Value == null 
+                 || dgvTable.Rows[row].Cells[columm].Value.ToString() == String.Empty
                  || dgvTable.Rows[row].Cells[columm].Value.ToString() == "1"
-                 || dgvTable.Rows[row].Cells[columm].Value.ToString() == "0" || dgvTable.Rows[row].Cells[columm].Value == null)
+                 || dgvTable.Rows[row].Cells[columm].Value.ToString() == "0")
             {
                 if (row == columm)
                     dgvTable.Rows[row].Cells[columm].Style.BackColor = System.Drawing.Color.LightGray;
@@ -259,7 +293,10 @@ namespace MatrixRework
 
 
 
-
+        /// <summary>
+        /// изменение размера таблицы
+        /// </summary>
+        /// <param name="size"></param>
         private void ReSizeTable(decimal size)
         {
             if (SizeTable > 0 && size!= SizeTable)
@@ -306,7 +343,11 @@ namespace MatrixRework
 
 
   
-
+        /// <summary>
+        /// открытие файла
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private async void MenuItemOpentxtFile_Click(object sender, RoutedEventArgs e)
         {
             OpenMatrixWindow openDialog = new OpenMatrixWindow(".txt");
@@ -352,6 +393,11 @@ namespace MatrixRework
             }
         }
 
+        /// <summary>
+        /// открытие файла
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void MenuItemOpenExcelFile_Click(object sender, RoutedEventArgs e)
         {
             OpenMatrixWindow openDialog = new OpenMatrixWindow(".excel");
@@ -389,6 +435,12 @@ namespace MatrixRework
 
         }
 
+
+        /// <summary>
+        /// сохранение файла
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void MenuItemSavetxtFile_Click(object sender, RoutedEventArgs e)
         {
             Microsoft.Win32.SaveFileDialog saveDialog = new Microsoft.Win32.SaveFileDialog();
@@ -417,6 +469,12 @@ namespace MatrixRework
             }
         }
 
+
+        /// <summary>
+        /// событие изменение размера таблицы
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void numudSizeMatrix_ValueChanged(object sender, EventArgs e)
         {
               ReSizeTable(numudSizeMatrix.Value);

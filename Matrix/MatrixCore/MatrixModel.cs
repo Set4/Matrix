@@ -173,6 +173,11 @@ namespace MatrixCore
         public event EventHandler<EventMessage> StepSearchСircuit = delegate { };
 
 
+        /// <summary>
+        /// обработчик события шаг вычисления контуров
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Matrix_StepSearchСircuit(object sender, EventMessage e)
         {
             StepSearchСircuit(this, new EventMessage(e.Message, e.Item));
